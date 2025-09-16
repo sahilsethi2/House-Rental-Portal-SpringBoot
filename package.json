@@ -1,0 +1,19 @@
+{
+  "name": "house-rental-portal",
+  "version": "1.0.0",
+  "description": "Full-stack house rental platform with Spring Boot and React",
+  "scripts": {
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && ./mvnw spring-boot:run",
+    "frontend": "cd frontend && npm start",
+    "install-all": "npm install && cd backend && ./mvnw clean install && cd ../frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "test": "cd backend && ./mvnw test && cd ../frontend && npm test"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "keywords": ["spring-boot", "react", "java", "mysql", "jwt", "material-ui"],
+  "author": "Sahil Kumar",
+  "license": "MIT"
+}
