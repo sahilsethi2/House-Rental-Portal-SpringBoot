@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth } from '../contexts/AuthContext';
 import {
   Container,
   AppBar,
@@ -41,7 +42,8 @@ function TabPanel(props) {
   );
 }
 
-const CustomerDashboard = ({ userName, onLogout }) => {
+const CustomerDashboard = () => {
+  const { user, logout } = useAuth();
   const [tabValue, setTabValue] = useState(0);
   const [properties, setProperties] = useState([]);
   const [bookings, setBookings] = useState([]);
@@ -50,30 +52,33 @@ const CustomerDashboard = ({ userName, onLogout }) => {
   const [success, setSuccess] = useState('');
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
   
   // Booking form state
   const [bookingForm, setBookingForm] = useState({
-    customerName: userName,
-    customerEmail: '',
+    customerName: user?.name || '',
+    customerEmail: user?.email || '',
     customerPhone: '',
     checkInDate: '',
     checkOutDate: ''
   });
 
   useEffect(() => {
-    fetchCustomerData();
-    // Get email from App.js if passed, otherwise use a default for demo
-    setUserEmail(`${userName.toLowerCase().replace(' ', '.')}@email.com`);
-    setBookingForm(prev => ({ ...prev, customerEmail: `${userName.toLowerCase().replace(' ', '.')}@email.com` }));
-  }, [userName]);
+    if (user) {
+      fetchCustomerData();
+      setBookingForm(prev => ({
+        ...prev,
+        customerName: user.name,
+        customerEmail: user.email
+      }));
+    }
+  }, [user]);
 
   const fetchCustomerData = async () => {
     try {
       setLoading(true);
       const [propertiesRes, bookingsRes] = await Promise.all([
-        axios.get('http://localhost:8082/api/properties'),
-        axios.get(`http://localhost:8082/api/bookings/customer/${userName.toLowerCase().replace(' ', '.')}@email.com`)
+        axios.get('http://localhost:8080/api/properties'),
+        axios.get(`http://localhost:8080/api/bookings/customer/${user?.email}`)
       ]);
       setProperties(propertiesRes.data);
       setBookings(bookingsRes.data);
@@ -90,14 +95,18 @@ const CustomerDashboard = ({ userName, onLogout }) => {
 
   const handleBookProperty = (property) => {
     setSelectedProperty(property);
-    setBookingForm(prev => ({ ...prev, customerName: userName }));
+    setBookingForm(prev => ({
+      ...prev,
+      customerName: user?.name,
+      customerEmail: user?.email
+    }));
     setBookingDialogOpen(true);
   };
 
   const handleBookingSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8082/api/bookings', {
+      await axios.post('http://localhost:8080/api/bookings', {
         propertyId: selectedProperty.id,
         customerName: bookingForm.customerName,
         customerEmail: bookingForm.customerEmail,
@@ -108,8 +117,8 @@ const CustomerDashboard = ({ userName, onLogout }) => {
       setSuccess('Booking submitted successfully! Property owner will review your request.');
       setBookingDialogOpen(false);
       setBookingForm({
-        customerName: userName,
-        customerEmail: `${userName.toLowerCase().replace(' ', '.')}@email.com`,
+        customerName: user?.name || '',
+        customerEmail: user?.email || '',
         customerPhone: '',
         checkInDate: '',
         checkOutDate: ''
@@ -138,9 +147,9 @@ const CustomerDashboard = ({ userName, onLogout }) => {
         <Toolbar>
           <Person sx={{ mr: 2 }} />
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Customer Dashboard - Welcome, {userName}!
+            Customer Dashboard - Welcome, {user?.name}!
           </Typography>
-          <Button color="inherit" onClick={onLogout} startIcon={<ExitToApp />}>
+          <Button color="inherit" onClick={logout} startIcon={<ExitToApp />}>
             Logout
           </Button>
         </Toolbar>
@@ -168,14 +177,43 @@ const CustomerDashboard = ({ userName, onLogout }) => {
                 <Card elevation={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                   <Box
                     sx={{
-                      height: 150,
-                      backgroundColor: 'primary.light',
+                      height: 200,
+                      borderRadius: 1,
+                      overflow: 'hidden',
+                      mb: 2,
+                      backgroundColor: 'grey.100',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'
                     }}
                   >
-                    <Home sx={{ fontSize: 60, color: 'white' }} />
+                    {property.imageUrl ? (
+                      <img
+                        src={property.imageUrl}
+                        alt={property.title}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover'
+                        }}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <Box
+                      sx={{
+                        display: property.imageUrl ? 'none' : 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '100%',
+                        backgroundColor: 'primary.light',
+                        color: 'white'
+                      }}
+                    >
+                      <Home sx={{ fontSize: 60 }} />
+                    </Box>
                   </Box>
                   
                   <CardContent sx={{ flexGrow: 1 }}>
@@ -385,3 +423,4 @@ const CustomerDashboard = ({ userName, onLogout }) => {
 };
 
 export default CustomerDashboard;
+

@@ -75,9 +75,9 @@ const AdminDashboard = () => {
       setLoading(true);
       
       const [propertiesRes, usersRes, locationsRes] = await Promise.all([
-        axios.get('http://localhost:8082/api/admin/properties'),
-        axios.get('http://localhost:8082/api/admin/users'),
-        axios.get('http://localhost:8082/api/admin/locations')
+        axios.get('http://localhost:8080/api/admin/properties'),
+        axios.get('http://localhost:8080/api/admin/users'),
+        axios.get('http://localhost:8080/api/admin/locations')
       ]);
 
       setProperties(propertiesRes.data);
@@ -94,7 +94,7 @@ const AdminDashboard = () => {
 
   const handlePropertyAction = async (propertyId, action) => {
     try {
-      await axios.put(`http://localhost:8082/api/admin/properties/${propertyId}/${action}`);
+      await axios.put(`http://localhost:8080/api/admin/properties/${propertyId}/${action}`);
       fetchAdminData(); // Refresh data
     } catch (error) {
       console.error(`Error ${action} property:`, error);
@@ -108,7 +108,7 @@ const AdminDashboard = () => {
 
   const handleAddLocation = async () => {
     try {
-      await axios.post('http://localhost:8082/api/admin/locations', newLocation);
+      await axios.post('http://localhost:8080/api/admin/locations', newLocation);
       setLocationDialog(false);
       setNewLocation({ city: '', state: '', zipCode: '' });
       fetchAdminData();
@@ -416,3 +416,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+

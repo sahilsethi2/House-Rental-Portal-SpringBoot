@@ -45,7 +45,7 @@ const BookProperty = () => {
   const fetchPropertyDetails = async () => {
     try {
       setPropertyLoading(true);
-      const response = await axios.get(`http://localhost:8082/api/properties/${propertyId}`);
+      const response = await axios.get(`http://localhost:8080/api/properties/${propertyId}`);
       setProperty(response.data);
     } catch (error) {
       console.error('Error fetching property:', error);
@@ -109,7 +109,7 @@ const BookProperty = () => {
         totalCost: calculateTotalCost()
       };
 
-      await axios.post('http://localhost:8082/api/bookings', bookingData);
+      await axios.post('http://localhost:8080/api/bookings', bookingData);
       
       setSuccess('Booking request submitted successfully! You will be notified once the owner responds.');
       
@@ -296,3 +296,4 @@ const BookProperty = () => {
 };
 
 export default BookProperty;
+

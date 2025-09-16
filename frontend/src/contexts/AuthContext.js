@@ -38,48 +38,16 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
-    try {
-      const response = await axios.post('http://localhost:8082/api/auth/login', {
-        email,
-        password
-      });
-
-      const { token: newToken, name, role } = response.data;
-      // Remove ROLE_ prefix if present for consistent frontend usage
-      const cleanRole = role.startsWith('ROLE_') ? role.substring(5) : role;
-      const userData = { email, name, role: cleanRole };
-
-      setToken(newToken);
-      setUser(userData);
-      
-      localStorage.setItem('token', newToken);
-      localStorage.setItem('user', JSON.stringify(userData));
-      
-      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-      
-      return { success: true };
-    } catch (error) {
-      console.error('Login error:', error);
-      return { 
-        success: false, 
-        message: error.response?.data || 'Login failed' 
-      };
-    }
+  const login = (token, userData) => {
+    setToken(token);
+    setUser(userData);
+    
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   };
 
-  const register = async (userData) => {
-    try {
-      const response = await axios.post('http://localhost:8082/api/auth/register', userData);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Registration error:', error);
-      return { 
-        success: false, 
-        message: error.response?.data || 'Registration failed' 
-      };
-    }
-  };
 
   const logout = () => {
     setToken(null);
@@ -101,7 +69,6 @@ export const AuthProvider = ({ children }) => {
     user,
     token,
     login,
-    register,
     logout,
     isAuthenticated,
     hasRole,
@@ -114,3 +81,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+

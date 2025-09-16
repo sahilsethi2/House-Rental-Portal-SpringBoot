@@ -37,7 +37,7 @@ const AddPropertyForm = () => {
     setSuccess('');
 
     try {
-const response = await axios.post('http://localhost:8082/api/properties/demo', {
+const response = await axios.post('http://localhost:8080/api/properties/demo', {
         ...formData,
         monthlyRent: parseFloat(formData.monthlyRent)
       });
@@ -148,3 +148,4 @@ const response = await axios.post('http://localhost:8082/api/properties/demo', {
 };
 
 export default AddPropertyForm;
+

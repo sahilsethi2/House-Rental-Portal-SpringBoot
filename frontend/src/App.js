@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import RoleSelector from './components/RoleSelector';
+import { AuthProvider } from './contexts/AuthContext';
+import Login from './components/Login';
+import SignUp from './components/SignUp';
 import OwnerDashboard from './components/OwnerDashboard';
 import CustomerDashboard from './components/CustomerDashboard';
+import PropertyList from './components/PropertyList';
+import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
 const theme = createTheme({
@@ -19,43 +23,41 @@ const theme = createTheme({
 });
 
 function App() {
-  const [userRole, setUserRole] = useState(null);
-  const [userName, setUserName] = useState('');
-
-  const handleRoleSelect = (role, name) => {
-    setUserRole(role);
-    setUserName(name);
-  };
-
-  const handleLogout = () => {
-    setUserRole(null);
-    setUserName('');
-  };
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <div className="App">
-          {!userRole ? (
-            <RoleSelector onRoleSelect={handleRoleSelect} />
-          ) : (
+      <AuthProvider>
+        <Router>
+          <div className="App">
             <Routes>
+              <Route path="/" element={<Navigate to="/properties" replace />} />
+              <Route path="/properties" element={<PropertyList />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
               <Route 
-                path="/*" 
+                path="/owner-dashboard" 
                 element={
-                  userRole === 'owner' ? 
-                    <OwnerDashboard userName={userName} onLogout={handleLogout} /> :
-                    <CustomerDashboard userName={userName} onLogout={handleLogout} />
+                  <ProtectedRoute requiredRole="OWNER">
+                    <OwnerDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/customer-dashboard" 
+                element={
+                  <ProtectedRoute requiredRole="CUSTOMER">
+                    <CustomerDashboard />
+                  </ProtectedRoute>
                 } 
               />
             </Routes>
-          )}
-        </div>
-      </Router>
+          </div>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
 
 export default App;
+
 

@@ -48,7 +48,7 @@ const AddProperty = () => {
 
   const fetchLocations = async () => {
     try {
-      const response = await axios.get('http://localhost:8082/api/admin/locations/public');
+      const response = await axios.get('http://localhost:8080/api/admin/locations/public');
       setLocations(response.data);
     } catch (error) {
       console.error('Error fetching locations:', error);
@@ -71,7 +71,7 @@ const AddProperty = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8082/api/properties', {
+      const response = await axios.post('http://localhost:8080/api/properties', {
         ...formData,
         bedrooms: parseInt(formData.bedrooms),
         bathrooms: parseInt(formData.bathrooms),
@@ -279,3 +279,4 @@ const AddProperty = () => {
 };
 
 export default AddProperty;
+

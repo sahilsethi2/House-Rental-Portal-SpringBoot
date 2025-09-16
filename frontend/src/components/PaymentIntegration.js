@@ -101,3 +101,4 @@ const PaymentIntegration = ({ open, onClose, bookingDetails, onPaymentSuccess })
 };
 
 export default PaymentIntegration;
+

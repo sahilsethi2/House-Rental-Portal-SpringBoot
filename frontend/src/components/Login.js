@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import axios from 'axios';
 import {
   Container,
   Paper,
@@ -9,8 +10,12 @@ import {
   Typography,
   Alert,
   Box,
-  CircularProgress
+  CircularProgress,
+  Link,
+  InputAdornment,
+  IconButton
 } from '@mui/material';
+import { Visibility, VisibilityOff, Login as LoginIcon } from '@mui/icons-material';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -19,6 +24,7 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -38,15 +44,31 @@ const Login = () => {
     setError('');
     setLoading(true);
 
-    const result = await login(formData.email, formData.password);
-    
-    if (result.success) {
-      navigate(from, { replace: true });
-    } else {
-      setError(result.message);
+    try {
+      const response = await axios.post('http://localhost:8080/api/auth/login', {
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (response.data.success) {
+        // Store token and user info
+        login(response.data.token, response.data.user);
+        
+        // Redirect based on role
+        if (response.data.user.role === 'OWNER') {
+          navigate('/owner-dashboard');
+        } else {
+          navigate('/customer-dashboard');
+        }
+      } else {
+        setError(response.data.message || 'Login failed');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (
@@ -60,8 +82,14 @@ const Login = () => {
         }}
       >
         <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
-          <Typography component="h1" variant="h4" align="center" gutterBottom>
-            Sign In
+          <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
+            <LoginIcon sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
+            <Typography component="h1" variant="h4" color="primary">
+              Sign In
+            </Typography>
+          </Box>
+          <Typography variant="body1" align="center" color="text.secondary" mb={3}>
+            Welcome back! Please sign in to your account
           </Typography>
           
           {error && (
@@ -89,11 +117,23 @@ const Login = () => {
               fullWidth
               name="password"
               label="Password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               id="password"
               autoComplete="current-password"
               value={formData.password}
               onChange={handleChange}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
             />
             <Button
               type="submit"
@@ -105,9 +145,17 @@ const Login = () => {
               {loading ? <CircularProgress size={24} /> : 'Sign In'}
             </Button>
             <Box textAlign="center">
-              <Link to="/register">
-                Don't have an account? Sign Up
-              </Link>
+              <Typography variant="body2" color="text.secondary">
+                Don't have an account?{' '}
+                <Link 
+                  component="button" 
+                  variant="body2" 
+                  onClick={() => navigate('/signup')}
+                  sx={{ textDecoration: 'none' }}
+                >
+                  Sign Up
+                </Link>
+              </Typography>
             </Box>
           </Box>
         </Paper>
@@ -117,3 +165,4 @@ const Login = () => {
 };
 
 export default Login;
+
