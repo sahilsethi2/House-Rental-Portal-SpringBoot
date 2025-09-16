@@ -1,4 +1,4 @@
-# House Rental Portal - Demo Version
+# House Rental Portal
 
 🏠 **A simplified, fully functional house rental platform for demonstration purposes**
 
@@ -17,13 +17,10 @@ Built with Spring Boot (backend) and React (frontend), this demo version showcas
 ### Backend
 - **Spring Boot 3.2.0** - Main framework
 - **Spring Data JPA** - Database operations
-- **H2 Database** - In-memory database (no setup required!)
-- **Lombok** - Code generation
 - **Maven** - Build tool
 
 ### Frontend
 - **React 18** - UI framework
-- **Material-UI (MUI)** - Component library
 - **React Router** - Routing
 - **Axios** - HTTP client
 
@@ -42,8 +39,6 @@ cd backend
 *On Windows, use: `mvnw.cmd spring-boot:run`*
 
 ✅ **Backend will start on:** `http://localhost:8081`  
-✅ **Sample data is automatically loaded!**  
-✅ **H2 Database Console:** `http://localhost:8081/h2-console` (optional)
 
 ### 🎨 Step 2: Start the Frontend
 ```bash
@@ -99,8 +94,6 @@ Open your browser to `http://localhost:3000` and start exploring the house renta
 
 ## 📝 Notes for Teacher/Evaluator
 
-- **No Authentication Required** - Simplified for easy demonstration
-- **No Database Setup** - Uses H2 in-memory database
 - **Sample Data Included** - Properties are pre-loaded on startup
 - **Full Stack Working** - Both REST API and React frontend functional
 - **Easy to Run** - Just two commands to start everything
@@ -132,6 +125,3 @@ Open your browser to `http://localhost:3000` and start exploring the house renta
 *Demo Version - House Rental Portal*  
 *Built with Spring Boot & React*
 
----
-
-*This is a simplified demo version showcasing full-stack development skills with modern web technologies.*
